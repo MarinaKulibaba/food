@@ -1,0 +1,198 @@
+/* Figma ITEMS tile — node 1:2626 (51.02 × 53.352) */
+
+.tile {
+  position: relative;
+  width: 51.02px;
+  height: 53.352px;
+  flex: 0 0 51.02px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.tile:focus-visible {
+  outline: 2px solid #f57a3d;
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+.tileSelected .frameImg {
+  filter: drop-shadow(0 0 2px rgba(245, 122, 61, 0.95));
+}
+
+.tileSelected .panel {
+  outline: 2px solid #f57a3d;
+  outline-offset: -1px;
+}
+
+.tileSelected .label,
+.tileSelected .labelMulti {
+  color: #7a5543;
+  font-weight: 700;
+}
+
+.frame {
+  position: absolute;
+  inset: -0.68% -0.71%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.frameImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.earLeft {
+  position: absolute;
+  inset: 4.75% 67.26% 86.53% 14.7%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  container-type: size;
+}
+
+.earLeftInner {
+  flex: none;
+  width: 97.244%;
+  height: 88.8225%;
+  transform: rotate(3.33deg);
+}
+
+.earLeftInner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.earRight {
+  position: absolute;
+  inset: 5.98% 15.71% 86.57% 68.86%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1;
+  container-type: size;
+}
+
+.earRightInner {
+  flex: none;
+  width: 97.244%;
+  height: 88.8225%;
+  transform: scaleX(-1) rotate(-3.33deg);
+}
+
+.earRightInner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/* Cream plate under the white ear strip */
+.panel {
+  position: absolute;
+  inset: 15.39% 5.14% 4.55% 5.14%;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 8px 8px 11px 11px;
+  pointer-events: none;
+}
+
+.panelBg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+/* Icon centered in the upper part of the cream plate */
+.iconSlot {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: 8%;
+  height: 48%;
+  display: grid;
+  place-items: center;
+}
+
+.iconImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: center center;
+}
+
+.label {
+  position: absolute;
+  left: 50%;
+  top: 35.57px;
+  z-index: 3;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: 42px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-fridge), "Darumadrop One", cursive;
+  font-size: 8.16px;
+  line-height: normal;
+  letter-spacing: -0.408px;
+  color: #956829;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.labelMulti {
+  position: absolute;
+  left: 50%;
+  top: 34.8px;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 42px;
+  font-family: var(--font-fridge), "Darumadrop One", cursive;
+  font-size: 6.8px;
+  line-height: 0.85;
+  letter-spacing: -0.3px;
+  color: #956829;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.selectedMark {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: #5c6b4a;
+  box-shadow: 0 1px 2px rgba(26, 28, 25, 0.18);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}

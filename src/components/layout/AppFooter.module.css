@@ -1,0 +1,30 @@
+.footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 250, 243, 0.96);
+  border-top: 1px solid #e7e1d6;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.item {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  color: rgba(122, 85, 67, 0.55);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 14px;
+}
+
+.itemActive {
+  color: #f57a3d;
+  background: rgba(245, 122, 61, 0.08);
+}
