@@ -251,8 +251,7 @@
   gap: 12px;
   align-items: flex-start;
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto;
 }
 
 .sectionHead {
@@ -262,6 +261,7 @@
   width: 100%;
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
 .sectionHead h2 {
@@ -282,15 +282,17 @@
 
 .fridgeRail {
   display: flex;
-  align-items: center;
-  gap: 1.564px;
+  align-items: flex-start;
+  gap: 4px;
   width: 100%;
   max-width: 342px;
-  height: 62.738px;
+  min-height: 72px;
+  height: 72px;
+  flex: 0 0 72px;
   margin-top: 2px;
   overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4.693px 24px 4.693px 0.782px;
+  overflow-y: visible;
+  padding: 6px 24px 6px 2px;
   scroll-padding-inline-end: 24px;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
@@ -300,6 +302,10 @@
 
 .fridgeRail > * {
   flex: 0 0 51.02px;
+  width: 51.02px;
+  height: 53.352px;
+  min-width: 51.02px;
+  min-height: 53.352px;
 }
 
 .addMoreBtn {
@@ -309,6 +315,7 @@
   gap: 4px;
   align-self: start;
   width: auto;
+  flex-shrink: 0;
   padding: 8px 12px;
   border: 1px solid #f57a3d;
   border-radius: 100px;
@@ -333,7 +340,7 @@
 
 .emptyState {
   display: flex;
-  flex: 1;
+  flex: 0 0 auto;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -398,6 +405,7 @@
 .findRecipesBtn {
   width: 100%;
   min-height: 48px;
+  flex-shrink: 0;
   border: 0;
   border-radius: 16px;
   background: #f57a3d;

@@ -4,6 +4,8 @@
   position: relative;
   width: 51.02px;
   height: 53.352px;
+  min-width: 51.02px;
+  min-height: 53.352px;
   flex: 0 0 51.02px;
   padding: 0;
   border: 0;
@@ -12,6 +14,7 @@
   -webkit-tap-highlight-color: transparent;
   overflow: visible;
   isolation: isolate;
+  flex-shrink: 0;
 }
 
 .tile:focus-visible {
