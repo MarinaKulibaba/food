@@ -39,7 +39,7 @@ const PROFILE_KEY = "food.userProfile";
 
 function footerTabForView(view: View): FooterTab {
   // Only the photo-scan flow belongs to the Fridge tab.
-  // Choose Ingredients (from Add Ingredients) stays under Home.
+  // Choose Ingredients (from Add to fridge) stays under Home.
   if (view === "add") return "fridge";
   if (
     view === "favorites" ||

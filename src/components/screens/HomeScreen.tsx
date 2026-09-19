@@ -29,6 +29,7 @@ export function HomeScreen({
   onOpenSettings,
 }: HomeScreenProps) {
   const count = selected.length;
+  const isEmpty = count === 0;
 
   const extras = useMemo(
     () => selected.filter((item) => !isFridgeCatalogItem(item)),
@@ -76,18 +77,15 @@ export function HomeScreen({
       <div className={`screen__scroll ${styles.homeScroll}`}>
         <article className={styles.banner}>
           <div className={styles.bannerText}>
-            <h2>Ready to cook?</h2>
-            <p>
-              Pick ingredients from your pantry list, or open Fridge to scan a
-              photo.
-            </p>
+            <h2>Step 1: your fridge</h2>
+            <p>Tap what you have at home. Then press Find Recipes.</p>
             <div className={styles.bannerActions}>
               <button
                 type="button"
                 className={styles.bannerCta}
                 onClick={onAddIngredients}
               >
-                Add Ingredients
+                Add to fridge
               </button>
             </div>
           </div>
@@ -101,10 +99,20 @@ export function HomeScreen({
           />
         </article>
 
+        {isEmpty ? (
+          <p className={styles.conceptHint} role="note">
+            1) Add products &nbsp;→&nbsp; 2) Find Recipes &nbsp;→&nbsp; 3) Cook
+          </p>
+        ) : null}
+
         <section className={styles.fridgeSection}>
           <div className={styles.sectionHead}>
             <h2>Your Fridge Items ({count})</h2>
-            <p>Ingredients ready to use in recipes</p>
+            <p>
+              {isEmpty
+                ? "Select products below or tap Add to fridge"
+                : `${count} selected — ready for recipes`}
+            </p>
           </div>
 
           <div className={styles.fridgeRail} data-name="chips-list">
@@ -147,31 +155,33 @@ export function HomeScreen({
             </button>
           ) : null}
 
-          <div className={styles.emptyState} data-name="empty-state-recipes">
-            <div className={styles.emptyArt} aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/figma/pot-empty.png"
-                alt=""
-                className={styles.emptyPot}
-                width={150}
-                height={81}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/figma/home/pot-lid.png"
-                alt=""
-                className={styles.emptyLid}
-                width={120}
-                height={65}
-              />
+          {isEmpty ? (
+            <div className={styles.emptyState} data-name="empty-state-recipes">
+              <div className={styles.emptyArt} aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/figma/pot-empty.png"
+                  alt=""
+                  className={styles.emptyPot}
+                  width={150}
+                  height={81}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/figma/home/pot-lid.png"
+                  alt=""
+                  className={styles.emptyLid}
+                  width={120}
+                  height={65}
+                />
+              </div>
+              <h3 className={styles.emptyTitle}>Start here</h3>
+              <p className={styles.emptyCopy}>
+                Pick food from the row above, or tap{" "}
+                <strong>Add to fridge</strong> for more products.
+              </p>
             </div>
-            <h3 className={styles.emptyTitle}>What do you have today?</h3>
-            <p className={styles.emptyCopy}>
-              Tap &quot;Add Ingredients&quot; to choose from the list, or use
-              Fridge in the footer to scan a photo.
-            </p>
-          </div>
+          ) : null}
         </section>
       </div>
     </section>

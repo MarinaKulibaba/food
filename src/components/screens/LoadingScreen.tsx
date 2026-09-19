@@ -12,24 +12,32 @@ type LoadingScreenProps = {
   onComplete?: () => void;
 };
 
-type Phase = "closed" | "steam" | "open" | "leaflet1" | "leaflet2";
+type Phase =
+  | "closed"
+  | "steam"
+  | "open"
+  | "appear"
+  | "drawnFront"
+  | "swapped"
+  | "ready";
 
 const PHASE_MS = {
-  closed: 650,
-  steam: 1000,
-  open: 850,
-  leaflet1: 700,
-  leaflet2: 900,
+  closed: 600,
+  steam: 900,
+  open: 800,
+  appear: 750,
+  drawnFront: 1100,
+  swapped: 900,
 } as const;
 
 export function LoadingScreen({
   selected,
+  recipes = [],
   ready = false,
   onBack,
   onComplete,
 }: LoadingScreenProps) {
   const [phase, setPhase] = useState<Phase>("closed");
-  const [done, setDone] = useState(false);
   const completedRef = useRef(false);
 
   useEffect(() => {
@@ -43,32 +51,46 @@ export function LoadingScreen({
     timers.push(window.setTimeout(() => setPhase("open"), t));
 
     t += PHASE_MS.open;
-    timers.push(window.setTimeout(() => setPhase("leaflet1"), t));
+    timers.push(window.setTimeout(() => setPhase("appear"), t));
 
-    t += PHASE_MS.leaflet1;
-    timers.push(window.setTimeout(() => setPhase("leaflet2"), t));
+    t += PHASE_MS.appear;
+    timers.push(window.setTimeout(() => setPhase("drawnFront"), t));
 
-    t += PHASE_MS.leaflet2;
-    timers.push(window.setTimeout(() => setDone(true), t));
+    t += PHASE_MS.drawnFront;
+    timers.push(window.setTimeout(() => setPhase("swapped"), t));
+
+    t += PHASE_MS.swapped;
+    timers.push(window.setTimeout(() => setPhase("ready"), t));
 
     return () => timers.forEach((id) => window.clearTimeout(id));
   }, []);
 
-  useEffect(() => {
-    if (!(done && ready) || completedRef.current) return;
+  function finish() {
+    if (completedRef.current) return;
+    if (!ready || phase !== "ready") return;
+    completedRef.current = true;
+    onComplete?.();
+  }
 
-    // Short beat so the last leaflet can settle, then go to results.
-    const id = window.setTimeout(() => {
-      if (completedRef.current) return;
-      completedRef.current = true;
-      onComplete?.();
-    }, 450);
+  const lidUp =
+    phase === "open" ||
+    phase === "appear" ||
+    phase === "drawnFront" ||
+    phase === "swapped" ||
+    phase === "ready";
 
-    return () => window.clearTimeout(id);
-  }, [done, ready, onComplete]);
+  const cardsVisible =
+    phase === "appear" ||
+    phase === "drawnFront" ||
+    phase === "swapped" ||
+    phase === "ready";
 
-  const showDrawn = phase === "leaflet1" || phase === "leaflet2";
-  const showPhoto = phase === "leaflet2";
+  const swapped = phase === "swapped" || phase === "ready";
+  const interactive = phase === "ready" && ready;
+  const waitingForAi = phase === "ready" && !ready;
+
+  const primaryName = recipes[0]?.name ?? "Mushroom Pizza";
+  const secondaryName = recipes[1]?.name ?? "Veggie Omelette";
 
   return (
     <section
@@ -89,16 +111,10 @@ export function LoadingScreen({
       </header>
 
       <div className={styles.body}>
-        <div className={styles.stage} aria-hidden="true">
+        <div className={styles.stage}>
           <div
-            className={`${styles.steam} ${
-              phase === "steam" ||
-              phase === "open" ||
-              phase === "leaflet1" ||
-              phase === "leaflet2"
-                ? styles.steamOn
-                : ""
-            }`}
+            className={`${styles.steam} ${lidUp ? styles.steamOn : ""}`}
+            aria-hidden="true"
           >
             <span />
             <span />
@@ -106,7 +122,7 @@ export function LoadingScreen({
           </div>
 
           <div
-            className={`${styles.glow} ${showDrawn ? styles.glowOn : ""}`}
+            className={`${styles.glow} ${cardsVisible ? styles.glowOn : ""}`}
             aria-hidden="true"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -128,10 +144,26 @@ export function LoadingScreen({
           </div>
 
           <div className={styles.leaflets}>
-            <div
-              className={`${styles.leaflet} ${styles.leafletPhoto} ${
-                showPhoto ? styles.leafletPhotoOn : ""
-              }`}
+            <button
+              type="button"
+              className={[
+                styles.leaflet,
+                styles.leafletPhoto,
+                cardsVisible ? styles.leafletVisible : "",
+                phase === "appear" ? styles.leafletPhotoAppear : "",
+                phase === "drawnFront" ? styles.leafletPhotoBack : "",
+                swapped ? styles.leafletPhotoSwapped : "",
+                interactive ? styles.leafletInteractive : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={finish}
+              disabled={!interactive}
+              aria-label={
+                interactive
+                  ? `Open recipes — ${secondaryName}`
+                  : secondaryName
+              }
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -139,12 +171,26 @@ export function LoadingScreen({
                 alt=""
                 className={styles.leafletPhotoImg}
               />
-            </div>
+            </button>
 
-            <div
-              className={`${styles.leaflet} ${styles.leafletDrawn} ${
-                showDrawn ? styles.leafletDrawnOn : ""
-              }`}
+            <button
+              type="button"
+              className={[
+                styles.leaflet,
+                styles.leafletDrawn,
+                cardsVisible ? styles.leafletVisible : "",
+                phase === "appear" ? styles.leafletDrawnAppear : "",
+                phase === "drawnFront" ? styles.leafletDrawnFront : "",
+                swapped ? styles.leafletDrawnSwapped : "",
+                interactive ? styles.leafletInteractive : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={finish}
+              disabled={!interactive}
+              aria-label={
+                interactive ? `Open recipes — ${primaryName}` : primaryName
+              }
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -152,7 +198,7 @@ export function LoadingScreen({
                 alt=""
                 className={styles.leafletDrawnImg}
               />
-            </div>
+            </button>
           </div>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -168,13 +214,7 @@ export function LoadingScreen({
           <img
             src="/figma/loading/lid.png"
             alt=""
-            className={`${styles.lid} ${
-              phase === "open" ||
-              phase === "leaflet1" ||
-              phase === "leaflet2"
-                ? styles.lidOpen
-                : ""
-            }`}
+            className={`${styles.lid} ${lidUp ? styles.lidOpen : ""}`}
             width={140}
             height={76}
           />
@@ -186,9 +226,23 @@ export function LoadingScreen({
             Our kitchen helper is matching your selected items to find the
             perfect recipes.
           </p>
+          {interactive ? (
+            <p className={styles.tapHint}>Tap a recipe card to continue</p>
+          ) : null}
+          {waitingForAi ? (
+            <p className={styles.tapHint}>Almost ready…</p>
+          ) : null}
         </div>
 
-        <div className={styles.potBox}>
+        <button
+          type="button"
+          className={`${styles.potBox} ${
+            interactive ? styles.potBoxInteractive : ""
+          }`}
+          onClick={finish}
+          disabled={!interactive}
+          aria-label="Open recipes for selected ingredients"
+        >
           <p className={styles.potLabel}>Adding to the pot:</p>
           <div className={styles.potChips}>
             {selected.map((item) => (
@@ -197,7 +251,7 @@ export function LoadingScreen({
               </span>
             ))}
           </div>
-        </div>
+        </button>
       </div>
     </section>
   );

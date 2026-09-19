@@ -245,6 +245,30 @@
   background: #e66a2c;
 }
 
+.conceptHint {
+  margin: 0;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(92, 107, 74, 0.1);
+  border: 1px solid rgba(92, 107, 74, 0.18);
+  color: #7a5543;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.conceptHint strong {
+  font-weight: 700;
+  color: #5c6b4a;
+}
+
+.conceptHint em {
+  font-style: normal;
+  font-weight: 700;
+  color: #f57a3d;
+}
+
 .fridgeSection {
   display: flex;
   flex-direction: column;

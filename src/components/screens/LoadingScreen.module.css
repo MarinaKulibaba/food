@@ -179,68 +179,96 @@
   background: transparent;
   opacity: 0;
   pointer-events: none;
+  cursor: default;
+  transition:
+    opacity 0.5s ease,
+    transform 0.8s cubic-bezier(0.22, 1.15, 0.36, 1),
+    z-index 0s linear 0.2s;
 }
 
+.leafletVisible {
+  opacity: 1;
+}
+
+.leafletInteractive {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.leafletInteractive:focus-visible {
+  outline: 2px solid #fff0da;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+/* Drawn card — starts popping out, then sits in front */
 .leafletDrawn {
   left: 8px;
   top: 0;
   width: 168px;
-  z-index: 3;
-  transform: translateY(48px) scale(0.45) rotate(-4deg);
-  transition:
-    opacity 0.45s ease,
-    transform 0.75s cubic-bezier(0.22, 1.15, 0.36, 1);
+  transform: translateY(56px) scale(0.4) rotate(-4deg);
   filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35));
 }
 
-.leafletDrawnOn {
-  opacity: 1;
+.leafletDrawnAppear {
+  z-index: 3;
+  transform: translateY(12px) scale(0.78) rotate(-5deg);
+}
+
+.leafletDrawnFront {
+  z-index: 4;
   transform: translateY(-8px) scale(1) rotate(-6deg);
+}
+
+.leafletDrawnSwapped {
+  z-index: 2;
+  transform: translateY(10px) translateX(42px) scale(0.82) rotate(8deg);
 }
 
 .leafletDrawnImg {
   display: block;
   width: 100%;
   height: auto;
+  pointer-events: none;
 }
 
+/* Photo card — appears behind, then swaps to front */
 .leafletPhoto {
   left: 78px;
   top: 18px;
   width: 108px;
-  z-index: 2;
-  transform: translateY(56px) scale(0.4) rotate(8deg);
-  transition:
-    opacity 0.4s ease 0.05s,
-    transform 0.7s cubic-bezier(0.22, 1.15, 0.36, 1) 0.05s;
+  transform: translateY(60px) scale(0.35) rotate(10deg);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
   background: #fff7ee;
 }
 
-.leafletPhotoOn {
-  opacity: 1;
-  transform: translateY(4px) translateX(10px) scale(1) rotate(11deg);
+.leafletPhotoAppear {
+  z-index: 2;
+  transform: translateY(18px) translateX(6px) scale(0.7) rotate(9deg);
+}
+
+.leafletPhotoBack {
+  z-index: 2;
+  transform: translateY(4px) translateX(10px) scale(0.92) rotate(11deg);
+}
+
+.leafletPhotoSwapped {
+  z-index: 4;
+  left: 18px;
+  top: 0;
+  width: 150px;
+  transform: translateY(-10px) translateX(0) scale(1) rotate(-4deg);
 }
 
 .leafletPhotoImg {
   display: block;
   width: 100%;
-  height: 132px;
+  height: 148px;
   object-fit: cover;
   object-position: 55% 40%;
-}
-
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+  pointer-events: none;
 }
 
 .message {
@@ -266,6 +294,15 @@
   line-height: 1.45;
 }
 
+.tapHint {
+  margin: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+  animation: pulse-hint 1.4s ease-in-out infinite;
+}
+
 .potBox {
   width: min(100%, 300px);
   background: rgba(0, 0, 0, 0.2);
@@ -275,6 +312,15 @@
   text-align: left;
   color: inherit;
   font: inherit;
+  cursor: default;
+}
+
+.potBoxInteractive {
+  cursor: pointer;
+}
+
+.potBoxInteractive:hover {
+  background: rgba(0, 0, 0, 0.28);
 }
 
 .potLabel {
@@ -317,12 +363,23 @@
   }
 }
 
+@keyframes pulse-hint {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .lid,
   .leaflet,
   .steam span,
   .glow,
-  .glowBurstLight {
+  .glowBurstLight,
+  .tapHint {
     transition: none;
     animation: none;
   }
@@ -331,9 +388,10 @@
     transform: translateX(-6%) translateY(-48px) rotate(48deg);
   }
 
-  .leafletDrawnOn,
-  .leafletPhotoOn {
+  .leafletDrawnFront,
+  .leafletDrawnSwapped,
+  .leafletPhotoBack,
+  .leafletPhotoSwapped {
     opacity: 1;
-    transform: none;
   }
 }

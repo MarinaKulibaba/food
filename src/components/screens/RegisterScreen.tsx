@@ -126,8 +126,8 @@ export function RegisterScreen({
             <span> kitchen club</span>
           </h1>
           <p className={styles.copy}>
-            Create a quick profile so we can save your fridge favorites and
-            greet you properly.
+            Then fill your fridge with what you have — we&apos;ll suggest recipes
+            that match.
           </p>
         </div>
 
