@@ -479,6 +479,65 @@ input {
   font-weight: 600;
 }
 
+.recipe-card__buy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.recipe-card__buy-title {
+  margin: 0;
+  color: #f57a3d;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.recipe-card__buy-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recipe-card__buy-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid #e7e1d6;
+  border-radius: 999px;
+  background: #fff;
+  color: #7a5543;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recipe-card__buy-toggle--on {
+  border-color: #f57a3d;
+  background: rgba(245, 122, 61, 0.1);
+  color: #d35d43;
+  box-shadow: 0 0 0 2px rgba(245, 122, 61, 0.12);
+}
+
+.recipe-card__buy-check {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(122, 85, 67, 0.08);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.recipe-card__buy-toggle--on .recipe-card__buy-check {
+  background: #f57a3d;
+  color: #fff;
+}
+
 .recipe-card__perfect {
   margin: 0;
   color: #5c6b4a;

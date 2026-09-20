@@ -16,6 +16,7 @@ type RecipeRequestBody = {
   ingredients?: string[];
   diet?: string;
   language?: string;
+  mood?: string;
 };
 
 function normalizeDifficulty(value: unknown): Difficulty {
@@ -26,23 +27,28 @@ function normalizeDifficulty(value: unknown): Difficulty {
 }
 
 function toSuggestions(recipes: AiRecipe[]): RecipeSuggestion[] {
-  return recipes.slice(0, 5).map((recipe, index) => ({
-    id: `ai-${index + 1}`,
-    name: recipe.name,
-    description: recipe.description,
-    cookTimeMinutes: Number(recipe.cookTimeMinutes) || 30,
-    difficulty: normalizeDifficulty(recipe.difficulty),
-    matchedIngredients: Array.isArray(recipe.matchedIngredients)
-      ? recipe.matchedIngredients.map(String)
-      : [],
-    missingIngredients: Array.isArray(recipe.missingIngredients)
-      ? recipe.missingIngredients.map(String)
-      : [],
-    youtubeSearchUrl: youtubeTutorialUrl(recipe.name),
-  }));
+  return recipes.slice(0, 3).map((recipe, index) => {
+    const missing = Array.isArray(recipe.missingIngredients)
+      ? recipe.missingIngredients.map(String).filter(Boolean).slice(0, 2)
+      : [];
+
+    return {
+      id: `ai-${index + 1}`,
+      name: recipe.name,
+      description: recipe.description,
+      cookTimeMinutes: Number(recipe.cookTimeMinutes) || 30,
+      difficulty: normalizeDifficulty(recipe.difficulty),
+      matchedIngredients: Array.isArray(recipe.matchedIngredients)
+        ? recipe.matchedIngredients.map(String)
+        : [],
+      // First two dishes: fully covered. Third may need 1–2 buys.
+      missingIngredients: index < 2 ? [] : missing,
+      youtubeSearchUrl: youtubeTutorialUrl(recipe.name),
+    };
+  });
 }
 
-function buildSystemPrompt(language: string, diet: string) {
+function buildSystemPrompt(language: string, diet: string, mood: string) {
   const useUkrainian =
     language.toLowerCase().includes("укр") ||
     language.toLowerCase().includes("ukrain");
@@ -55,11 +61,35 @@ function buildSystemPrompt(language: string, diet: string) {
     ? `Respect this dietary preference when possible: ${diet}.`
     : "No special dietary preference.";
 
+  const moodParts = mood
+    .split(/[,+|]/)
+    .map((part) => part.trim().toLowerCase())
+    .filter(Boolean);
+  const moodHints: string[] = [];
+  if (moodParts.includes("quick")) {
+    moodHints.push("Prefer quick recipes that take about 15 minutes or less.");
+  }
+  if (moodParts.includes("healthy")) {
+    moodHints.push("Prefer light, fresh, healthy recipes.");
+  }
+  if (moodParts.includes("comforting")) {
+    moodHints.push("Prefer cozy, comforting, warming recipes.");
+  }
+  const moodRule =
+    moodHints.length > 0
+      ? moodHints.join(" ")
+      : "No special mood preference.";
+
   return `You are a helpful cooking assistant for the FooD fridge app.
-Given ingredients the user has on hand, suggest 3 to 5 recipes that best use those ingredients.
+Given ingredients the user has on hand, suggest exactly 3 recipes that best use those ingredients.
 ${langRule}
 ${dietRule}
-Prefer recipes that maximize matched ingredients. Keep missingIngredients short (0-3 common pantry items).
+${moodRule}
+Recipe rules:
+1) First recipe: use ONLY the user's ingredients. missingIngredients MUST be [].
+2) Second recipe: also fully covered by the user's ingredients. missingIngredients MUST be [].
+3) Third recipe: may need 1 or 2 extra pantry items the user does not have. Put those in missingIngredients (1–2 items max).
+Prefer recipes that maximize matched ingredients.
 Return ONLY valid JSON with this exact shape:
 {
   "recipes": [
@@ -79,6 +109,7 @@ async function fetchAiRecipes(
   ingredients: string[],
   diet: string,
   language: string,
+  mood: string,
 ): Promise<RecipeSuggestion[] | null> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) return null;
@@ -98,7 +129,7 @@ async function fetchAiRecipes(
       messages: [
         {
           role: "system",
-          content: buildSystemPrompt(language, diet),
+          content: buildSystemPrompt(language, diet, mood),
         },
         {
           role: "user",
@@ -139,6 +170,7 @@ export async function POST(request: Request) {
       .filter(Boolean);
     const diet = String(body.diet ?? "").trim();
     const language = String(body.language ?? "English").trim() || "English";
+    const mood = String(body.mood ?? "quick").trim() || "quick";
 
     if (ingredients.length === 0) {
       return NextResponse.json(
@@ -147,7 +179,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const aiRecipes = await fetchAiRecipes(ingredients, diet, language);
+    const aiRecipes = await fetchAiRecipes(ingredients, diet, language, mood);
     const payload: RecipesResponse = aiRecipes
       ? { recipes: aiRecipes, source: "ai" }
       : { recipes: buildMockRecipes(ingredients), source: "mock" };

@@ -341,12 +341,37 @@
 .potChip {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   padding: 6px 10px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   font-size: 12px;
   font-weight: 400;
+}
+
+.potChipMissing {
+  background: rgba(245, 122, 61, 0.28);
+  border: 1px solid rgba(245, 184, 120, 0.55);
+  color: #ffe8d4;
+}
+
+.potChipMissing em {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ffd2a8;
+  opacity: 0.95;
+}
+
+.missingNote {
+  margin: 10px 0 0;
+  color: rgba(255, 230, 200, 0.78);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 @keyframes steam-rise {

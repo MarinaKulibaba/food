@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import styles from "./screens.module.css";
 import type { RecipeSuggestion } from "@/lib/types";
 
@@ -21,6 +22,15 @@ export function DetailScreen({
     `Cook using ${recipe.matchedIngredients.slice(0, 3).join(", ") || "your selected items"} until fragrant and golden.`,
     `Finish and plate. Total time about ${recipe.cookTimeMinutes} minutes.`,
   ];
+  const [buyList, setBuyList] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (const item of recipe.missingIngredients) initial[item] = true;
+    return initial;
+  });
+
+  function toggleBuy(item: string) {
+    setBuyList((prev) => ({ ...prev, [item]: !prev[item] }));
+  }
 
   return (
     <section className="screen" data-name="screen-detail">
@@ -82,14 +92,34 @@ export function DetailScreen({
                 <span>{item}</span>
               </li>
             ))}
-            {recipe.missingIngredients.map((item) => (
-              <li key={`x-${item}`} className={styles.missingItem}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/figma/plus.svg" alt="" width={14} height={14} />
-                <span>{item}</span>
-              </li>
-            ))}
           </ul>
+
+          {recipe.missingIngredients.length > 0 ? (
+            <div className={styles.buyBlock}>
+              <h3 className={styles.buyTitle}>
+                Треба купити — у вашому холодильнику не знайшлося
+              </h3>
+              <div className={styles.buyToggles} role="group">
+                {recipe.missingIngredients.map((item) => {
+                  const on = Boolean(buyList[item]);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`${styles.buyToggle} ${
+                        on ? styles.buyToggleOn : ""
+                      }`}
+                      aria-pressed={on}
+                      onClick={() => toggleBuy(item)}
+                    >
+                      <span aria-hidden="true">{on ? "✓" : "+"}</span>
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
         </article>
 
         <section>

@@ -278,6 +278,43 @@
   flex: 0 0 auto;
 }
 
+.chipsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+  align-content: flex-start;
+  width: 100%;
+}
+
+.fridgeRail {
+  display: flex;
+  align-items: center;
+  gap: 1.564px;
+  width: 100%;
+  max-width: 342px;
+  height: 62.738px;
+  min-height: 62.738px;
+  flex: 0 0 auto;
+  margin-top: 0;
+  overflow-x: auto;
+  overflow-y: clip;
+  padding: 4.693px 0.782px;
+  scroll-padding-inline-end: 24px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 0;
+}
+
+.fridgeRail > * {
+  flex: 0 0 51.02px;
+  width: 51.02px;
+  height: 53.352px;
+  min-width: 51.02px;
+  min-height: 53.352px;
+}
+
 .sectionHead {
   display: flex;
   flex-direction: column;
@@ -302,34 +339,6 @@
   font-size: 14px;
   font-weight: 400;
   line-height: normal;
-}
-
-.fridgeRail {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  max-width: 342px;
-  min-height: 72px;
-  height: 72px;
-  flex: 0 0 72px;
-  margin-top: 2px;
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 6px 24px 6px 2px;
-  scroll-padding-inline-end: 24px;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-  z-index: 0;
-}
-
-.fridgeRail > * {
-  flex: 0 0 51.02px;
-  width: 51.02px;
-  height: 53.352px;
-  min-width: 51.02px;
-  min-height: 53.352px;
 }
 
 .addMoreBtn {
@@ -808,6 +817,66 @@
 
 .missingItem {
   color: rgba(122, 85, 67, 0.7);
+}
+
+.buyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e7e1d6;
+}
+
+.buyTitle {
+  margin: 0;
+  color: #f57a3d;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.buyToggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.buyToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e7e1d6;
+  border-radius: 999px;
+  background: #fff;
+  color: #7a5543;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.buyToggleOn {
+  border-color: #f57a3d;
+  background: rgba(245, 122, 61, 0.1);
+  color: #d35d43;
+  box-shadow: 0 0 0 2px rgba(245, 122, 61, 0.12);
+}
+
+.buyToggle span {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(122, 85, 67, 0.08);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.buyToggleOn span {
+  background: #f57a3d;
+  color: #fff;
 }
 
 .stepsTitle {

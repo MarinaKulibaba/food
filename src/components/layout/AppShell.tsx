@@ -14,7 +14,6 @@ import { SettingsScreen } from "@/components/screens/SettingsScreen";
 import { AppFooter, type FooterTab } from "@/components/layout/AppFooter";
 import { useSelectedIngredients } from "@/hooks/useSelectedIngredients";
 import { useFavoriteRecipes } from "@/hooks/useFavoriteRecipes";
-import { FRIDGE_CATALOG } from "@/data/fridgeIcons";
 import { readKitchenPrefs } from "@/lib/kitchenPrefs";
 import type { RecipeSuggestion, RecipesResponse } from "@/lib/types";
 
@@ -141,6 +140,7 @@ export function AppShell() {
           ingredients: selected.map((item) => item.name),
           diet: prefs.diet,
           language: prefs.language,
+          mood: prefs.moods.join(","),
         }),
       });
 
@@ -188,7 +188,7 @@ export function AppShell() {
             <HomeScreen
               kitchenName={kitchenName}
               selected={selected}
-              onAddIngredients={() => setView("selection")}
+              onAddIngredients={() => setView("add")}
               onAddMore={() => setView("selection")}
               onToggle={toggleIngredient}
               onFindRecipes={findRecipes}
@@ -200,17 +200,9 @@ export function AppShell() {
             <AddIngredientsScreen
               onBack={() => setView("home")}
               onChoosePantry={() => setView("selection")}
-              onPhotoReady={() => {
-                addIngredients(
-                  FRIDGE_CATALOG.filter((item) =>
-                    ["egg", "carrot", "potato", "mushroom"].includes(item.id),
-                  ).map((item) =>
-                    item.id === "egg"
-                      ? { ...item, id: "eggs", name: "Eggs" }
-                      : item,
-                  ),
-                );
-                setView("selection");
+              onConfirmDetected={(ingredients) => {
+                addIngredients(ingredients);
+                setView("home");
               }}
             />
           ) : null}

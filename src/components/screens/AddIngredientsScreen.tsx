@@ -1,27 +1,51 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import styles from "./AddIngredientsScreen.module.css";
+import { fridgeIconFor } from "@/data/fridgeIcons";
+import {
+  mockFridgeScan,
+  type FridgeScanResult,
+} from "@/lib/fridgeScan";
+import type { Ingredient } from "@/lib/types";
 
 type AddIngredientsScreenProps = {
   onBack: () => void;
   onChoosePantry: () => void;
-  onPhotoReady: (source: "camera" | "gallery") => void;
+  onConfirmDetected: (ingredients: Ingredient[]) => void;
 };
 
-type Mode = "choose" | "preview";
+type Mode = "choose" | "preview" | "result";
 
 export function AddIngredientsScreen({
   onBack,
   onChoosePantry,
-  onPhotoReady,
+  onConfirmDetected,
 }: AddIngredientsScreenProps) {
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<Mode>("choose");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [source, setSource] = useState<"camera" | "gallery">("camera");
+  const [fileBytes, setFileBytes] = useState(0);
   const [analyzing, setAnalyzing] = useState(false);
+  const [scan, setScan] = useState<FridgeScanResult | null>(null);
+  const [picked, setPicked] = useState<Record<string, boolean>>({});
+
+  const confirmedList = useMemo(() => {
+    if (!scan || scan.kind !== "found") return [];
+    return [...scan.detected, ...scan.unclear].filter((item) => picked[item.id]);
+  }, [scan, picked]);
+
+  function resetToChoose() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setMode("choose");
+    setAnalyzing(false);
+    setScan(null);
+    setPicked({});
+    setFileBytes(0);
+  }
 
   function handleFile(
     file: File | undefined,
@@ -34,23 +58,43 @@ export function AddIngredientsScreen({
       return url;
     });
     setSource(nextSource);
+    setFileBytes(file.size);
+    setScan(null);
+    setPicked({});
     setMode("preview");
   }
 
   function handleUsePhoto() {
     setAnalyzing(true);
     window.setTimeout(() => {
+      const result = mockFridgeScan(fileBytes);
+      setScan(result);
+      if (result.kind === "found") {
+        const next: Record<string, boolean> = {};
+        for (const item of result.detected) next[item.id] = true;
+        for (const item of result.unclear) next[item.id] = false;
+        setPicked(next);
+      }
       setAnalyzing(false);
-      onPhotoReady(source);
+      setMode("result");
     }, 1400);
   }
 
-  function handleRetake() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(null);
-    setMode("choose");
-    setAnalyzing(false);
+  function togglePicked(id: string) {
+    setPicked((prev) => ({ ...prev, [id]: !prev[id] }));
   }
+
+  function handleConfirm() {
+    if (confirmedList.length === 0) return;
+    onConfirmDetected(confirmedList);
+  }
+
+  const title =
+    mode === "result"
+      ? "Scan result"
+      : mode === "preview"
+        ? "Fridge snapshot"
+        : "Add to fridge";
 
   return (
     <section className={`screen ${styles.screen}`} data-name="screen-add-ingredients">
@@ -58,23 +102,30 @@ export function AddIngredientsScreen({
         <button
           type="button"
           className={styles.backBtn}
-          onClick={mode === "preview" ? handleRetake : onBack}
+          onClick={
+            mode === "choose"
+              ? onBack
+              : mode === "result"
+                ? resetToChoose
+                : () => {
+                    setMode("choose");
+                    setAnalyzing(false);
+                  }
+          }
           aria-label="Back"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/figma/arrow-left.svg" alt="" width={20} height={20} />
         </button>
-        <h1 className={styles.title}>
-          {mode === "preview" ? "Fridge snapshot" : "Add Ingredients"}
-        </h1>
+        <h1 className={styles.title}>{title}</h1>
         <span className={styles.headerSpacer} />
       </header>
 
       {mode === "choose" ? (
         <div className={`screen__scroll ${styles.body}`}>
           <p className={styles.lead}>
-            Take a quick snapshot of your fridge or upload a photo — we&apos;ll
-            help spot what you already have.
+            Take a photo of your fridge or upload a picture — we&apos;ll spot
+            what you already have.
           </p>
 
           <div className={styles.actions}>
@@ -87,7 +138,7 @@ export function AddIngredientsScreen({
                 <CameraIcon />
               </span>
               <span className={styles.cardText}>
-                <strong>Quick snapshot</strong>
+                <strong>Take a photo</strong>
                 <span>Open camera and scan your fridge</span>
               </span>
             </button>
@@ -101,8 +152,8 @@ export function AddIngredientsScreen({
                 <GalleryIcon />
               </span>
               <span className={styles.cardText}>
-                <strong>Upload fridge photo</strong>
-                <span>Choose a picture from your gallery</span>
+                <strong>Upload a picture</strong>
+                <span>Choose an image from your gallery</span>
               </span>
             </button>
           </div>
@@ -115,12 +166,18 @@ export function AddIngredientsScreen({
             Or choose from pantry list
           </button>
         </div>
-      ) : (
+      ) : null}
+
+      {mode === "preview" ? (
         <div className={`screen__scroll ${styles.previewBody}`}>
           <div className={styles.previewFrame}>
             {previewUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={previewUrl} alt="Fridge preview" className={styles.previewImg} />
+              <img
+                src={previewUrl}
+                alt="Fridge preview"
+                className={styles.previewImg}
+              />
             ) : null}
             {analyzing ? (
               <div className={styles.analyzing}>
@@ -132,15 +189,15 @@ export function AddIngredientsScreen({
 
           <p className={styles.previewHint}>
             {source === "camera"
-              ? "Snapshot ready. Use it to detect ingredients."
-              : "Photo ready. Use it to detect ingredients."}
+              ? "Snapshot ready. Scan it to detect ingredients."
+              : "Picture ready. Scan it to detect ingredients."}
           </p>
 
           <div className={styles.previewActions}>
             <button
               type="button"
               className={styles.secondaryBtn}
-              onClick={handleRetake}
+              onClick={resetToChoose}
               disabled={analyzing}
             >
               Retake
@@ -151,11 +208,124 @@ export function AddIngredientsScreen({
               onClick={handleUsePhoto}
               disabled={analyzing}
             >
-              {analyzing ? "Scanning…" : "Use photo"}
+              {analyzing ? "Scanning…" : "Scan fridge"}
             </button>
           </div>
         </div>
-      )}
+      ) : null}
+
+      {mode === "result" && scan ? (
+        <div className={`screen__scroll ${styles.resultBody}`}>
+          {scan.kind === "empty" ? (
+            <>
+              <div className={styles.emptyCard} role="status">
+                <h2>Fridge looks empty</h2>
+                <p>{scan.message}</p>
+              </div>
+              <div className={styles.resultActions}>
+                <button
+                  type="button"
+                  className={styles.secondaryBtn}
+                  onClick={resetToChoose}
+                >
+                  Try another photo
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryBtn}
+                  onClick={onChoosePantry}
+                >
+                  Pick from list
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className={styles.resultLead}>{scan.message}</p>
+
+              <section className={styles.resultBlock}>
+                <h3>Found in photo</h3>
+                <ul className={styles.resultList}>
+                  {scan.detected.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={`${styles.resultItem} ${
+                          picked[item.id] ? styles.resultItemOn : ""
+                        }`}
+                        onClick={() => togglePicked(item.id)}
+                        aria-pressed={Boolean(picked[item.id])}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={fridgeIconFor(item.name)}
+                          alt=""
+                          width={28}
+                          height={28}
+                        />
+                        <span>{item.name}</span>
+                        <em>{picked[item.id] ? "Keep" : "Skip"}</em>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {scan.unclear.length > 0 ? (
+                <section className={styles.resultBlock}>
+                  <h3>Not sure — maybe missing?</h3>
+                  <p className={styles.unclearHint}>
+                    We couldn’t clearly see these. Turn on only what you really
+                    have.
+                  </p>
+                  <ul className={styles.resultList}>
+                    {scan.unclear.map((item) => (
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          className={`${styles.resultItem} ${
+                            picked[item.id] ? styles.resultItemOn : ""
+                          }`}
+                          onClick={() => togglePicked(item.id)}
+                          aria-pressed={Boolean(picked[item.id])}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={fridgeIconFor(item.name)}
+                            alt=""
+                            width={28}
+                            height={28}
+                          />
+                          <span>{item.name}</span>
+                          <em>{picked[item.id] ? "Add" : "Skip"}</em>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              <div className={styles.resultActions}>
+                <button
+                  type="button"
+                  className={styles.secondaryBtn}
+                  onClick={onChoosePantry}
+                >
+                  Add more manually
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryBtn}
+                  onClick={handleConfirm}
+                  disabled={confirmedList.length === 0}
+                >
+                  Add {confirmedList.length || ""} to fridge
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : null}
 
       <input
         ref={cameraRef}

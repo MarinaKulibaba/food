@@ -5,8 +5,13 @@ function pickMatched(ingredients: string[], count: number): string[] {
   return ingredients.slice(0, Math.min(count, ingredients.length));
 }
 
-function pickMissing(used: string[], pool: string[]): string[] {
-  return pool.filter((item) => !used.some((u) => u.toLowerCase() === item.toLowerCase())).slice(0, 2);
+function pickMissing(used: string[], pool: string[], max = 2): string[] {
+  return pool
+    .filter(
+      (item) =>
+        !used.some((u) => u.toLowerCase() === item.toLowerCase()),
+    )
+    .slice(0, max);
 }
 
 const TEMPLATES: Array<{
@@ -63,11 +68,15 @@ export function buildMockRecipes(ingredients: string[]): RecipeSuggestion[] {
   if (normalized.length === 0) return [];
 
   const main = normalized[0];
-  const count = Math.min(5, Math.max(3, Math.ceil(normalized.length / 2) + 2));
+  // Always return 3 dishes: 1–2 fully matched, 3rd needs 1–2 buys
+  const count = 3;
 
   return TEMPLATES.slice(0, count).map((template, index) => {
     const matched = pickMatched(normalized, Math.min(4, normalized.length));
-    const missing = pickMissing([...matched, ...normalized], template.extras);
+    const missing =
+      index >= 2
+        ? pickMissing([...matched, ...normalized], template.extras, 2)
+        : [];
     const name = template.name(main);
 
     return {

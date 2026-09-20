@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./screens.module.css";
 import type { Ingredient } from "@/lib/types";
 import { FridgeItemTile } from "@/components/ingredients/FridgeItemTile";
+import { MoodPicker, MoodPot } from "@/components/home/MoodPicker";
 import {
   FRIDGE_CATALOG,
   isFridgeCatalogItem,
 } from "@/data/fridgeIcons";
+import {
+  readKitchenPrefs,
+  writeCookingMoods,
+  type CookingMood,
+} from "@/lib/kitchenPrefs";
 
 type HomeScreenProps = {
   kitchenName?: string;
@@ -30,6 +36,11 @@ export function HomeScreen({
 }: HomeScreenProps) {
   const count = selected.length;
   const isEmpty = count === 0;
+  const [moods, setMoods] = useState<CookingMood[]>(["quick"]);
+
+  useEffect(() => {
+    setMoods(readKitchenPrefs().moods);
+  }, []);
 
   const extras = useMemo(
     () => selected.filter((item) => !isFridgeCatalogItem(item)),
@@ -42,6 +53,11 @@ export function HomeScreen({
         item.id === ingredient.id ||
         item.name.toLowerCase() === ingredient.name.toLowerCase(),
     );
+  }
+
+  function handleMoodsChange(next: CookingMood[]) {
+    setMoods(next);
+    writeCookingMoods(next);
   }
 
   return (
@@ -75,6 +91,8 @@ export function HomeScreen({
       </header>
 
       <div className={`screen__scroll ${styles.homeScroll}`}>
+        <MoodPicker value={moods} onChange={handleMoodsChange} />
+
         <article className={styles.banner}>
           <div className={styles.bannerText}>
             <h2>Step 1: your fridge</h2>
@@ -115,35 +133,37 @@ export function HomeScreen({
             </p>
           </div>
 
-          <div className={styles.fridgeRail} data-name="chips-list">
-            {FRIDGE_CATALOG.map((item) => (
-              <FridgeItemTile
-                key={item.id}
-                name={item.name}
-                selected={isSelected(item)}
-                onClick={() => onToggle(item)}
-              />
-            ))}
+          <div className={styles.chipsList} data-name="chips-list">
+            <div className={styles.fridgeRail}>
+              {FRIDGE_CATALOG.map((item) => (
+                <FridgeItemTile
+                  key={item.id}
+                  name={item.name}
+                  selected={isSelected(item)}
+                  onClick={() => onToggle(item)}
+                />
+              ))}
 
-            {extras.map((item) => (
-              <FridgeItemTile
-                key={item.id}
-                name={item.name}
-                selected
-                onClick={() => onToggle(item)}
-              />
-            ))}
+              {extras.map((item) => (
+                <FridgeItemTile
+                  key={item.id}
+                  name={item.name}
+                  selected
+                  onClick={() => onToggle(item)}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className={styles.addMoreBtn}
+              onClick={onAddMore}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/figma/plus-orange.svg" alt="" width={10} height={10} />
+              Add More
+            </button>
           </div>
-
-          <button
-            type="button"
-            className={styles.addMoreBtn}
-            onClick={onAddMore}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/figma/plus-orange.svg" alt="" width={10} height={10} />
-            Add More
-          </button>
 
           {count > 0 ? (
             <button
@@ -155,33 +175,7 @@ export function HomeScreen({
             </button>
           ) : null}
 
-          {isEmpty ? (
-            <div className={styles.emptyState} data-name="empty-state-recipes">
-              <div className={styles.emptyArt} aria-hidden="true">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/figma/pot-empty.png"
-                  alt=""
-                  className={styles.emptyPot}
-                  width={150}
-                  height={81}
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/figma/home/pot-lid.png"
-                  alt=""
-                  className={styles.emptyLid}
-                  width={120}
-                  height={65}
-                />
-              </div>
-              <h3 className={styles.emptyTitle}>Start here</h3>
-              <p className={styles.emptyCopy}>
-                Pick food from the row above, or tap{" "}
-                <strong>Add to fridge</strong> for more products.
-              </p>
-            </div>
-          ) : null}
+          <MoodPot ingredients={selected} />
         </section>
       </div>
     </section>

@@ -1,17 +1,20 @@
 import type { Ingredient } from "@/lib/types";
 
-/** Canonical "Your Fridge Items" catalog from Figma node 1:2624 */
+/** Canonical chips-list catalog from Figma node 1:1270 */
 export const FRIDGE_CATALOG: Ingredient[] = [
   { id: "pork", name: "Pork", category: "proteins" },
   { id: "beef", name: "Beef", category: "proteins" },
   { id: "egg", name: "Egg", category: "proteins" },
   { id: "fish", name: "Fish", category: "proteins" },
   { id: "mushroom", name: "Mushroom", category: "vegetables" },
-  { id: "strange-mushroom", name: "Strange Mushroom", category: "vegetables" },
   { id: "blueberries", name: "Blueberries", category: "vegetables" },
   { id: "potato", name: "Potato", category: "vegetables" },
   { id: "carrot", name: "Carrot", category: "vegetables" },
+  { id: "tomato", name: "Tomato", category: "vegetables" },
   { id: "rice", name: "Rice", category: "grains" },
+  { id: "milk", name: "Milk", category: "dairy" },
+  { id: "broccoli", name: "Broccoli", category: "vegetables" },
+  { id: "shrimp", name: "Shrimp", category: "proteins" },
 ];
 
 /** Icon paths for fridge tiles — matched 1:1 to Figma */
@@ -22,14 +25,15 @@ export const FRIDGE_ITEM_ICONS: Record<string, string> = {
   eggs: "/figma/fridge/egg.png",
   fish: "/figma/fridge/fish.png",
   salmon: "/figma/fridge/fish.png",
-  shrimp: "/figma/fridge/fish.png",
+  shrimp: "/figma/fridge/shrimp.png",
   mushroom: "/figma/fridge/mushroom.png",
-  "strange mushroom": "/figma/fridge/strange-mushroom.png",
-  "strange-mushroom": "/figma/fridge/strange-mushroom.png",
   blueberries: "/figma/fridge/blueberries.png",
   potato: "/figma/fridge/potato.png",
   carrot: "/figma/fridge/carrot.png",
+  tomato: "/figma/fridge/tomato.png",
   rice: "/figma/fridge/rice.png",
+  milk: "/figma/fridge/milk.png",
+  broccoli: "/figma/fridge/broccoli.png",
 };
 
 export const FRIDGE_ITEM_DEFAULT_ICON = "/figma/fridge/mushroom.png";

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { RecipeSuggestion } from "@/lib/types";
 
 type RecipeCardProps = {
@@ -18,6 +21,15 @@ export function RecipeCard({
   const perfect =
     recipe.missingIngredients.length === 0 &&
     recipe.matchedIngredients.length > 0;
+  const [buyList, setBuyList] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (const item of recipe.missingIngredients) initial[item] = true;
+    return initial;
+  });
+
+  function toggleBuy(item: string) {
+    setBuyList((prev) => ({ ...prev, [item]: !prev[item] }));
+  }
 
   return (
     <article className="recipe-card">
@@ -91,17 +103,44 @@ export function RecipeCard({
         <div className="recipe-card__ingredients">
           {recipe.matchedIngredients.length > 0 ? (
             <p className="recipe-card__matched">
-              <strong>✓ Matched:</strong>{" "}
+              <strong>✓ In your fridge:</strong>{" "}
               {recipe.matchedIngredients.join(", ")}
             </p>
           ) : null}
           {perfect ? (
-            <p className="recipe-card__perfect">✓ 100% matched!</p>
-          ) : recipe.missingIngredients.length > 0 ? (
-            <p className="recipe-card__missing">
-              <strong>+ Missing:</strong>{" "}
-              {recipe.missingIngredients.join(", ")}
-            </p>
+            <p className="recipe-card__perfect">✓ All ingredients ready!</p>
+          ) : null}
+
+          {recipe.missingIngredients.length > 0 ? (
+            <div className="recipe-card__buy">
+              <p className="recipe-card__buy-title">
+                Треба купити — у вашому холодильнику не знайшлося
+              </p>
+              <div className="recipe-card__buy-toggles" role="group">
+                {recipe.missingIngredients.map((item) => {
+                  const on = Boolean(buyList[item]);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      className={`recipe-card__buy-toggle ${
+                        on ? "recipe-card__buy-toggle--on" : ""
+                      }`}
+                      aria-pressed={on}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        toggleBuy(item);
+                      }}
+                    >
+                      <span className="recipe-card__buy-check" aria-hidden="true">
+                        {on ? "✓" : "+"}
+                      </span>
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ) : null}
         </div>
 
