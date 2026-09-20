@@ -47,7 +47,6 @@ export function FridgeItemTile({
         </span>
       </span>
 
-      {/* Cream plate — ALL content (icon + label) stays inside */}
       <span className={styles.panel} aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -55,16 +54,17 @@ export function FridgeItemTile({
           alt=""
           className={styles.panelBg}
         />
-        <span className={styles.iconSlot}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={fridgeIconFor(name)}
-            alt=""
-            className={styles.iconImg}
-            width={256}
-            height={256}
-          />
-        </span>
+      </span>
+
+      <span className={styles.iconSlot} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={fridgeIconFor(name)}
+          alt=""
+          className={styles.iconImg}
+          width={256}
+          height={256}
+        />
       </span>
 
       {isMultiline ? (

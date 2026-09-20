@@ -1,4 +1,4 @@
-/* Figma ITEMS tile — node 1:2626 (51.02 × 53.352) */
+/* Figma ITEMS tile — node 1:2626 / 41:1053 (51.02 × 53.352) */
 
 .tile {
   position: relative;
@@ -102,7 +102,7 @@
   max-width: none;
 }
 
-/* Cream plate under the white ear strip */
+/* Cream plate */
 .panel {
   position: absolute;
   inset: 15.39% 5.14% 4.55% 5.14%;
@@ -121,15 +121,19 @@
   max-width: none;
 }
 
-/* Icon centered in the upper part of the cream plate */
+/* Food icon — full image above the label band */
 .iconSlot {
   position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 8%;
-  height: 48%;
+  left: 50%;
+  top: 7px;
+  width: 30px;
+  height: 30px;
+  transform: translateX(-50%);
+  z-index: 3;
   display: grid;
   place-items: center;
+  pointer-events: none;
+  overflow: visible;
 }
 
 .iconImg {
@@ -141,11 +145,12 @@
   object-position: center center;
 }
 
+/* Label sits under the icon */
 .label {
   position: absolute;
   left: 50%;
-  top: 35.57px;
-  z-index: 3;
+  top: 36.5px;
+  z-index: 4;
   transform: translateX(-50%);
   margin: 0;
   max-width: 42px;
@@ -164,8 +169,8 @@
 .labelMulti {
   position: absolute;
   left: 50%;
-  top: 34.8px;
-  z-index: 3;
+  top: 35.5px;
+  z-index: 4;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -185,7 +190,7 @@
   position: absolute;
   top: 2px;
   right: 1px;
-  z-index: 4;
+  z-index: 5;
   display: grid;
   place-items: center;
   width: 13px;

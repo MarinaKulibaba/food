@@ -117,12 +117,6 @@ export function HomeScreen({
           />
         </article>
 
-        {isEmpty ? (
-          <p className={styles.conceptHint} role="note">
-            1) Add products &nbsp;→&nbsp; 2) Find Recipes &nbsp;→&nbsp; 3) Cook
-          </p>
-        ) : null}
-
         <section className={styles.fridgeSection}>
           <div className={styles.sectionHead}>
             <h2>Your Fridge Items ({count})</h2>
